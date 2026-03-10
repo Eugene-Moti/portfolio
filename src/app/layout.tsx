@@ -5,6 +5,8 @@ import { ThemeProvider } from "@/components/ui/ThemeToggle";
 import SmoothScroll from "@/components/ui/SmoothScroll";
 import AnimatedCursor from "@/components/ui/AnimatedCursor";
 import Preloader from "@/components/ui/Preloader";
+import ParticleBackground from "@/components/ui/ParticleBackground";
+import FloatingWhatsApp from "@/components/ui/FloatingWhatsApp";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,11 +36,14 @@ export default function RootLayout({
         <ThemeProvider>
           <Preloader />
           <AnimatedCursor />
+          <ParticleBackground />
           <SmoothScroll>
             {children}
           </SmoothScroll>
+          <FloatingWhatsApp />
         </ThemeProvider>
       </body>
     </html>
   );
 }
+
