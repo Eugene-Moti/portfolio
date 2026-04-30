@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import nodemailer from "nodemailer";
+import { getTransporter, getSMTPConfig } from "@/lib/smtp";
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,19 +12,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create transporter using Gmail SMTP
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "erickmoti3609@gmail.com",
-        pass: "ftwe qtmv ajab hijl", // App password
-      },
-    });
+    const transporter = getTransporter();
+    const { from } = getSMTPConfig();
 
     // Email to the portfolio owner
     const ownerMailOptions = {
-      from: "erickmoti3609@gmail.com",
-      to: "erickmoti3609@gmail.com",
+      from,
+      to: from,
       subject: `Portfolio Contact: ${name}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -44,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     // Confirmation email to the sender
     const confirmationMailOptions = {
-      from: "erickmoti3609@gmail.com",
+      from,
       to: email,
       subject: "Thank you for contacting Erick Moti",
       html: `
@@ -69,16 +63,17 @@ export async function POST(request: NextRequest) {
     await transporter.sendMail(ownerMailOptions);
     await transporter.sendMail(confirmationMailOptions);
 
+    console.log(`Contact form submitted - Email sent to ${email}`);
+
     return NextResponse.json(
       { message: "Email sent successfully" },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Email error:", error);
+    console.error("Contact form email error:", error);
     return NextResponse.json(
       { error: "Failed to send email. Please try again later." },
       { status: 500 }
     );
   }
 }
-
