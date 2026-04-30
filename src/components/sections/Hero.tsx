@@ -34,6 +34,15 @@ export default function Hero() {
     return () => clearInterval(interval);
   }, []);
 
+  const triggerResumeDownload = () => {
+    const link = document.createElement("a");
+    link.href = "/ErickMotiResume.pdf";
+    link.download = "ErickMotiResume.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleResumeDownload = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -45,29 +54,22 @@ export default function Hero() {
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        setIsSubmitted(true);
-        // Trigger download after a short delay
-        setTimeout(() => {
-          const link = document.createElement("a");
-          link.href = "/ErickMotiResume.pdf";
-          link.download = "ErickMotiResume.pdf";
-          link.click();
-          setShowResumeModal(false);
-          setIsSubmitted(false);
-          setFormData({ name: "", email: "", phone: "", company: "" });
-        }, 1500);
+      if (!response.ok) {
+        console.error("Resume notification failed:", await response.text());
       }
     } catch (error) {
       console.error("Error:", error);
-      // Still allow download even if email fails
-      const link = document.createElement("a");
-      link.href = "/ErickMotiResume.pdf";
-      link.download = "ErickMotiResume.pdf";
-      link.click();
-      setShowResumeModal(false);
     } finally {
       setIsSubmitting(false);
+      setIsSubmitted(true);
+
+      // Always let the visitor download the resume, even if the email notification fails.
+      setTimeout(() => {
+        triggerResumeDownload();
+        setShowResumeModal(false);
+        setIsSubmitted(false);
+        setFormData({ name: "", email: "", phone: "", company: "" });
+      }, 1500);
     }
   };
 
